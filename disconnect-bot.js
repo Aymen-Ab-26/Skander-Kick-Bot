@@ -23,4 +23,4 @@ http.createServer(async (req, res) => {
   } else {
     res.end("OK");
   }
-}).listen(9999, () => console.log("Listening on port 9999"));
+}).listen(process.env.PORT || 9999, () => console.log("Listening on port 9999"));
