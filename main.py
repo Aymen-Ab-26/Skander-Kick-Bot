@@ -1,38 +1,45 @@
-from flask import Flask, jsonify
+from flask import Flask
 import os
 import requests
 
 app = Flask(__name__)
 
-BOT_TOKEN = "MTUwMzAwOTQ3MTg2NDExMTExNA.GmLA-M.vodee5W-LcRY89d44S_WQCLsyr48t47oPH7Dt4"
-GUILD_ID = "1437390219237392387"
-TARGET_USER_ID = "597767820192776205"
+# Get from Railway Variables
+BOT_TOKEN = os.getenv("BOT_TOKEN")
+GUILD_ID = os.getenv("GUILD_ID")
+TARGET_USER_ID = os.getenv("TARGET_USER_ID")
 
 HEADERS = {
     "Authorization": f"Bot {BOT_TOKEN}",
     "Content-Type": "application/json"
 }
 
-
 @app.route("/disconnect")
 def disconnect_user():
+    if not all([BOT_TOKEN, GUILD_ID, TARGET_USER_ID]):
+        return "Error: Missing environment variables!", 500
+    
     url = f"https://discord.com/api/v10/guilds/{GUILD_ID}/members/{TARGET_USER_ID}"
     
-    payload = {"channel_id": None}
-    
-    response = requests.patch(url, headers=HEADERS, json=payload)
-    
-    if response.ok:
-        return "Disconnected!", 200
-    else:
-        return f"Failed: {response.status_code} - {response.text}", response.status_code
+    try:
+        response = requests.patch(url, headers=HEADERS, json={"channel_id": None}, timeout=10)
+        
+        if response.ok:
+            return "✅ User disconnected successfully!", 200
+        else:
+            return f"❌ Failed: {response.status_code} - {response.text}", response.status_code
+    except Exception as e:
+        return f"Error: {str(e)}", 500
 
 
 @app.route("/")
 def home():
-    return "Discord Disconnect Bot is running ✅"
+    return """
+    <h1>Discord Disconnect Bot ✅</h1>
+    <p><a href="/disconnect">Click here to disconnect the user</a></p>
+    """
 
 
 if __name__ == "__main__":
-    port = int(os.environ.get("PORT", 9999))
+    port = int(os.environ.get("PORT", 8080))   # Railway uses 8080
     app.run(host="0.0.0.0", port=port)
