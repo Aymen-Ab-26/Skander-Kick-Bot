@@ -1,0 +1,11 @@
+{
+  "name": "skander-kick-bot",
+  "version": "1.0.0",
+  "main": "disconnect-bot.js",
+  "scripts": {
+    "start": "node disconnect-bot.js"
+  },
+  "dependencies": {
+    "discord.js": "^14.0.0"
+  }
+}
